@@ -17,14 +17,17 @@ import java.util.Arrays;
 @RestController
 public class SignupController {
 
-    @Autowired
     private SignupService signupService;
 
+    public SignupController(SignupService signupService){
+        this.signupService=signupService;
+    }
+
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity<?> signup(@RequestBody User user) {
+    public ResponseEntity signup(@RequestBody User user) {
         user.setRoles(Arrays.asList(new UserRole("USER")));
-        User newUser = signupService.addUser(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        signupService.addUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }
