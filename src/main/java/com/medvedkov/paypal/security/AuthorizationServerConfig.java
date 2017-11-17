@@ -42,11 +42,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private String scopeRead;
     @Value("${security.scope-write}")
     private String scopeWrite;
+    @Value("${security.scope-trust}")
+    private String scopeTrust;
     @Value("${security.access-token-validity-seconds}")
     private int accessTokenValidityTime;
     @Value("${security.refresh-token-validity-seconds}")
     private int refreshTokenValidityTime;
-
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -55,7 +56,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .secret(clientSecret)
                 .authorizedGrantTypes(passGrant, "refresh_token")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .scopes(scopeRead, scopeWrite, "trust")
+                .scopes(scopeRead, scopeWrite, scopeTrust)
                 .accessTokenValiditySeconds(accessTokenValidityTime)
                 .refreshTokenValiditySeconds(refreshTokenValidityTime);
     }
