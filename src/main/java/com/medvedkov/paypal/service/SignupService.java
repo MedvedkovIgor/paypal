@@ -17,11 +17,14 @@ import com.medvedkov.paypal.repository.UserRepository;
 @Transactional
 public class SignupService {
 
-    @Autowired
     private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    public SignupService(UserRepository userRepository,PasswordEncoder passwordEncoder){
+        this.userRepository=userRepository;
+        this.passwordEncoder=passwordEncoder;
+    }
 
     public User addUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
