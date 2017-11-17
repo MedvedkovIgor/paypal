@@ -17,18 +17,21 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
     private TokenStore tokenStore;
-
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
     private UserApprovalHandler userApprovalHandler;
-
-    @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    public AuthorizationServerConfig(TokenStore tokenStore, UserDetailsServiceImpl userDetailsService,
+                                     UserApprovalHandler userApprovalHandler,
+                                     AuthenticationManager authenticationManager) {
+        this.tokenStore = tokenStore;
+        this.userDetailsService = userDetailsService;
+        this.userApprovalHandler = userApprovalHandler;
+        this.authenticationManager = authenticationManager;
+    }
 
     private static final String REALM = "FPC";
 
