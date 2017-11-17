@@ -1,6 +1,5 @@
 package com.medvedkov.paypal.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,16 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.medvedkov.paypal.entity.User;
 import com.medvedkov.paypal.entity.UserRole;
-import com.medvedkov.paypal.service.SignupService;
+import com.medvedkov.paypal.service.SignupServiceImpl;
 
 import java.util.Arrays;
 
 @RestController
 public class SignupController {
 
-    private SignupService signupService;
+    private SignupServiceImpl signupService;
 
-    public SignupController(SignupService signupService){
+    public SignupController(SignupServiceImpl signupService){
         this.signupService=signupService;
     }
 

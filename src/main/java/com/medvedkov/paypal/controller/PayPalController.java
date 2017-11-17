@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,12 +29,12 @@ public class PayPalController {
     private static String paypalRedirectLink;
 
     @RequestMapping("/create")
-    public ResponseEntity<Object> create() {
+    public ResponseEntity<Object> create(@RequestParam String total) {
         APIContext apiContext = new APIContext(CLIENT_ID, CLIENT_SECRET, MODE);
 
         Amount amount = new Amount();
         amount.setCurrency("USD");
-        amount.setTotal("7");
+        amount.setTotal(total);
 
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
