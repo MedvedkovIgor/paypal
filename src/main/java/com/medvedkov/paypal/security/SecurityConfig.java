@@ -25,11 +25,13 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private ClientDetailsService clientDetailsService;
-
-    @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    public SecurityConfig(ClientDetailsService clientDetailsService,UserDetailsServiceImpl userDetailsService){
+        this.clientDetailsService=clientDetailsService;
+        this.userDetailsService=userDetailsService;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -56,7 +58,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .realmName("FPC");
     }
-
 
     @Override
     @Bean
