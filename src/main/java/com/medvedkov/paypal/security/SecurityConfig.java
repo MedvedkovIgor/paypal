@@ -1,5 +1,6 @@
 package com.medvedkov.paypal.security;
 
+import com.medvedkov.paypal.service.FacebookConnectionSignupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,10 @@ import org.springframework.security.oauth2.provider.approval.TokenStoreUserAppro
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
+import org.springframework.social.connect.web.ProviderSignInController;
 
 @Configuration
 @EnableWebSecurity
@@ -28,9 +33,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private ClientDetailsService clientDetailsService;
     private UserDetailsServiceImpl userDetailsService;
 
-    public SecurityConfig(ClientDetailsService clientDetailsService,UserDetailsServiceImpl userDetailsService){
-        this.clientDetailsService=clientDetailsService;
-        this.userDetailsService=userDetailsService;
+    private ConnectionFactoryLocator connectionFactoryLocator;
+    private UsersConnectionRepository usersConnectionRepository;
+    private FacebookConnectionSignupService facebookConnectionSignupService;
+
+    public SecurityConfig(ClientDetailsService clientDetailsService, UserDetailsServiceImpl userDetailsService,
+                          UsersConnectionRepository usersConnectionRepository,
+                          ConnectionFactoryLocator connectionFactoryLocator,
+                          FacebookConnectionSignupService facebookConnectionSignupService) {
+        this.clientDetailsService = clientDetailsService;
+        this.userDetailsService = userDetailsService;
+        this.usersConnectionRepository=usersConnectionRepository;
+        this.connectionFactoryLocator=connectionFactoryLocator;
+        this.facebookConnectionSignupService=facebookConnectionSignupService;
     }
 
     @Override
@@ -50,11 +65,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/payment/**").permitAll()
-                .antMatchers("/signup").permitAll()
+                .antMatchers("/login*", "/signup/**", "/signin/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
                 //.antMatchers("/api/**").authenticated()
                 //.antMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated()
+                .and()
+                .formLogin().loginPage("/login").permitAll()
                 .and()
                 .httpBasic()
                 .realmName("FPC");
@@ -92,5 +109,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ProviderSignInController providerSignInController() {
+        ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(facebookConnectionSignupService);
+        return new ProviderSignInController(connectionFactoryLocator, usersConnectionRepository, new FacebookSignInAdapter());
     }
 }
