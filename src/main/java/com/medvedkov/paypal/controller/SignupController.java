@@ -22,7 +22,7 @@ public class SignupController {
         this.signupService=signupService;
     }
 
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    @RequestMapping(value = "/signuplocal", method = RequestMethod.POST)
     public ResponseEntity signup(@RequestBody User user) {
         user.setRoles(Arrays.asList(new UserRole("USER")));
         signupService.addUser(user);

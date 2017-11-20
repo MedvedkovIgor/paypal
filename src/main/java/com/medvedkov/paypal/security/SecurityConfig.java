@@ -2,8 +2,12 @@ package com.medvedkov.paypal.security;
 
 import com.medvedkov.paypal.service.FacebookConnectionSignupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +28,9 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
+import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.connect.web.ProviderSignInController;
+import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +42,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private ConnectionFactoryLocator connectionFactoryLocator;
     private UsersConnectionRepository usersConnectionRepository;
     private FacebookConnectionSignupService facebookConnectionSignupService;
+    @Value("${spring.social.facebook.appId}")
+    private String appId;
+    @Value("${spring.social.facebook.appSecret}")
+    private String appSecret;
 
     public SecurityConfig(ClientDetailsService clientDetailsService, UserDetailsServiceImpl userDetailsService,
                           UsersConnectionRepository usersConnectionRepository,
@@ -43,9 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           FacebookConnectionSignupService facebookConnectionSignupService) {
         this.clientDetailsService = clientDetailsService;
         this.userDetailsService = userDetailsService;
-        this.usersConnectionRepository=usersConnectionRepository;
-        this.connectionFactoryLocator=connectionFactoryLocator;
-        this.facebookConnectionSignupService=facebookConnectionSignupService;
+        this.usersConnectionRepository = usersConnectionRepository;
+        this.connectionFactoryLocator = connectionFactoryLocator;
+        this.facebookConnectionSignupService = facebookConnectionSignupService;
     }
 
     @Override
@@ -63,15 +73,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/**").permitAll()
                 .antMatchers("/payment/**").permitAll()
                 .antMatchers("/login*", "/signup/**", "/signin/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
-                //.antMatchers("/api/**").authenticated()
-                //.antMatchers("/api/**").hasRole("USER")
+//                .antMatchers("/resources/**").authenticated()
+//                .antMatchers("/resources/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+//                .formLogin().loginPage("/login").permitAll()
+//                .and().logout().logoutSuccessUrl("/").permitAll()
+                .formLogin()
+                .loginPage("/signin")
+                .loginProcessingUrl("/signin/authenticate")
+                .failureUrl("/signin?param.error=bad_credentials")
+                .and()
+                .logout()
+                .logoutUrl("/signout")
+                .deleteCookies("JSESSIONID")
                 .and()
                 .httpBasic()
                 .realmName("FPC");
@@ -109,6 +128,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
+    public ConnectionFactoryLocator connectionFactoryLocator() {
+        ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
+        registry.addConnectionFactory(new FacebookConnectionFactory(appId, appSecret));
+        return registry;
     }
 
     @Bean
