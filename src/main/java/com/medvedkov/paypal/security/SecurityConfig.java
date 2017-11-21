@@ -1,7 +1,6 @@
 package com.medvedkov.paypal.security;
 
-import com.medvedkov.paypal.repository.UserRepository;
-import com.medvedkov.paypal.service.FacebookConnectionSignupService;
+import com.medvedkov.paypal.service.ConnectionSignupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,14 +24,11 @@ import org.springframework.security.oauth2.provider.approval.TokenStoreUserAppro
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
-import org.springframework.social.connect.ConnectionFactory;
-import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
-import org.springframework.social.google.api.Google;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 
 @Configuration
@@ -41,8 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ClientDetailsService clientDetailsService;
     private UserDetailsServiceImpl userDetailsService;
-
-    private ConnectionFactoryLocator connectionFactoryLocator;
     private UsersConnectionRepository usersConnectionRepository;
 
     @Value("${spring.social.facebook.appId}")
@@ -54,20 +48,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.social.google.client.secret}")
     private String googleClientSecret;
 
-    @Autowired
-    private FacebookConnectionSignupService facebookConnectionSignupService;
-    @Autowired
-    private FacebookSignInAdapter facebookSignInAdapter;
+    private ConnectionSignupService connectionSignupService;
+    private SignInAdapterImpl signInAdapterImpl;
 
     public SecurityConfig(ClientDetailsService clientDetailsService, UserDetailsServiceImpl userDetailsService,
                           UsersConnectionRepository usersConnectionRepository,
-                          ConnectionFactoryLocator connectionFactoryLocator,
-                          FacebookConnectionSignupService facebookConnectionSignupService) {
+                          ConnectionSignupService connectionSignupService,
+                          SignInAdapterImpl signInAdapterImpl) {
         this.clientDetailsService = clientDetailsService;
         this.userDetailsService = userDetailsService;
         this.usersConnectionRepository = usersConnectionRepository;
-        this.connectionFactoryLocator = connectionFactoryLocator;
-//        this.facebookConnectionSignupService = facebookConnectionSignupService;
+        this.connectionSignupService=connectionSignupService;
+        this.signInAdapterImpl=signInAdapterImpl;
     }
 
     @Override
@@ -143,24 +135,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
-    public ConnectionFactoryLocator connectionFactoryLocator() {
-        ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
-//        registry.addConnectionFactory(new FacebookConnectionFactory(facebookAppId, facebookAppSecret));
-        registry.addConnectionFactory(new GoogleConnectionFactory(googleClientId, googleClientSecret));
-        return registry;
-    }
-
+    //FIXME отключить переопределение ConnectionFactoryLocator в spring boot
     @Bean
     public ProviderSignInController providerSignInController() {
-        return new ProviderSignInController(connectionFactoryLocator(), usersConnectionRepository, facebookSignInAdapter/*new FacebookSignInAdapter()*/);
+        ConnectionFactoryRegistry registry = new ConnectionFactoryRegistry();
+        registry.addConnectionFactory(new GoogleConnectionFactory(googleClientId, googleClientSecret));
+        registry.addConnectionFactory(new FacebookConnectionFactory(facebookAppId, facebookAppSecret));
+        return new ProviderSignInController(registry, usersConnectionRepository, signInAdapterImpl);
     }
 
     @Bean
     @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
-    public UsersConnectionRepository usersConnectionRepository(/*UserRepository userRepository*/) {
-        ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(facebookConnectionSignupService/*new FacebookConnectionSignupService(userRepository)*/);
+    public UsersConnectionRepository usersConnectionRepository() {
+        ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(connectionSignupService);
         return usersConnectionRepository;
     }
 }
