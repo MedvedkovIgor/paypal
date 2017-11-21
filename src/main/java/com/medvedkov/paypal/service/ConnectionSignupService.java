@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
 @Service
-public class FacebookConnectionSignupService implements ConnectionSignUp {
+public class ConnectionSignupService implements ConnectionSignUp {
 
     private UserRepository userRepository;
 
-    public FacebookConnectionSignupService(UserRepository userRepository){
+    public ConnectionSignupService(UserRepository userRepository){
         this.userRepository=userRepository;
     }
 
