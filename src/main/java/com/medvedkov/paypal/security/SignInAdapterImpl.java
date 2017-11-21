@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
 
 @Service
-public class FacebookSignInAdapter implements SignInAdapter {
+public class SignInAdapterImpl implements SignInAdapter {
     @Override
     public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
         System.out.println(" ====== Sign In adapter");
