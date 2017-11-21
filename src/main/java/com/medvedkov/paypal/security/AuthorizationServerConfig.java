@@ -23,16 +23,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
-    @Autowired
-    public AuthorizationServerConfig(TokenStore tokenStore, UserDetailsServiceImpl userDetailsService,
-                                     UserApprovalHandler userApprovalHandler,
-                                     AuthenticationManager authenticationManager) {
-        this.tokenStore = tokenStore;
-        this.userDetailsService = userDetailsService;
-        this.userApprovalHandler = userApprovalHandler;
-        this.authenticationManager = authenticationManager;
-    }
-
     private static final String REALM = "FPC";
 
     @Value("${security.client-id}")
@@ -51,6 +41,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private int accessTokenValidityTime;
     @Value("${security.refresh-token-validity-seconds}")
     private int refreshTokenValidityTime;
+
+    @Autowired
+    public AuthorizationServerConfig(TokenStore tokenStore, UserDetailsServiceImpl userDetailsService,
+                                     UserApprovalHandler userApprovalHandler,
+                                     AuthenticationManager authenticationManager) {
+        this.tokenStore = tokenStore;
+        this.userDetailsService = userDetailsService;
+        this.userApprovalHandler = userApprovalHandler;
+        this.authenticationManager = authenticationManager;
+    }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
