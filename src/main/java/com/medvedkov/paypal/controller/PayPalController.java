@@ -1,8 +1,12 @@
 package com.medvedkov.paypal.controller;
 
+import com.medvedkov.paypal.security.SignInAdapterImpl;
 import com.paypal.api.payments.*;
+import com.paypal.base.exception.PayPalException;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,8 +29,9 @@ public class PayPalController {
     @Value("${client_secret}")
     private String CLIENT_SECRET;
     @Value("${mode}")
-    private  String MODE;
+    private String MODE;
     private static String paypalRedirectLink;
+    private static final Logger logger = LoggerFactory.getLogger(SignInAdapterImpl.class);
 
     @RequestMapping("/create")
     public ResponseEntity<Object> create(@RequestParam String total) {
@@ -60,7 +65,7 @@ public class PayPalController {
         try {
             createdPayment = payment.create(apiContext);
         } catch (PayPalRESTException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         Iterator<Links> links = createdPayment.getLinks().iterator();
@@ -95,7 +100,7 @@ public class PayPalController {
         try {
             executedPayment = payment.execute(apiContext, paymentExecute);
         } catch (PayPalRESTException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return "sucess";
     }
