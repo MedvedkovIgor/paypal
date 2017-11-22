@@ -2,7 +2,7 @@ package com.medvedkov.paypal.security;
 
 import com.medvedkov.paypal.service.ConnectionSignupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -33,19 +33,16 @@ import org.springframework.social.google.connect.GoogleConnectionFactory;
 
 @Configuration
 @EnableWebSecurity
+@ConfigurationProperties(prefix = "spring.social")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ClientDetailsService clientDetailsService;
     private UserDetailsServiceImpl userDetailsService;
     private UsersConnectionRepository usersConnectionRepository;
 
-    @Value("${spring.social.facebook.appId}")
     private String facebookAppId;
-    @Value("${spring.social.facebook.appSecret}")
     private String facebookAppSecret;
-    @Value("${spring.social.google.client.id}")
     private String googleClientId;
-    @Value("${spring.social.google.client.secret}")
     private String googleClientSecret;
 
     private ConnectionSignupService connectionSignupService;
@@ -58,8 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.clientDetailsService = clientDetailsService;
         this.userDetailsService = userDetailsService;
         this.usersConnectionRepository = usersConnectionRepository;
-        this.connectionSignupService=connectionSignupService;
-        this.signInAdapterImpl=signInAdapterImpl;
+        this.connectionSignupService = connectionSignupService;
+        this.signInAdapterImpl = signInAdapterImpl;
     }
 
     @Override
@@ -149,5 +146,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public UsersConnectionRepository usersConnectionRepository() {
         ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(connectionSignupService);
         return usersConnectionRepository;
+    }
+
+    public void setFacebookAppId(String facebookAppId) {
+        this.facebookAppId = facebookAppId;
+    }
+
+    public void setFacebookAppSecret(String facebookAppSecret) {
+        this.facebookAppSecret = facebookAppSecret;
+    }
+
+    public void setGoogleClientId(String googleClientId) {
+        this.googleClientId = googleClientId;
+    }
+
+    public void setGoogleClientSecret(String googleClientSecret) {
+        this.googleClientSecret = googleClientSecret;
     }
 }
