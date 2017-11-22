@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -78,12 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/payment/**").permitAll()
 //                .antMatchers("/login*", "/signup/**", "/signin/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
-//                .antMatchers("/resources/**").authenticated()
-//                .antMatchers("/resources/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
-//                .formLogin().loginPage("/login").permitAll()
-//                .and().logout().logoutSuccessUrl("/").permitAll()
                 .formLogin()
                 .loginPage("/signin")
                 .loginProcessingUrl("/signin/authenticate")
@@ -142,7 +136,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
     public UsersConnectionRepository usersConnectionRepository() {
         ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(connectionSignupService);
         return usersConnectionRepository;

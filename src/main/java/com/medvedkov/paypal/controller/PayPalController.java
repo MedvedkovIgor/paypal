@@ -85,7 +85,6 @@ public class PayPalController {
     }
 
     @RequestMapping("/execute")
-
     public String execute(@RequestParam(value = "paymentId") String paymentId, @RequestParam(value = "token") String token, @RequestParam(value = "PayerID") String payerID) {
         APIContext apiContext = new APIContext(CLIENT_ID, CLIENT_SECRET, MODE);
 
