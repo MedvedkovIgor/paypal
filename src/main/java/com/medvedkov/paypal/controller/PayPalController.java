@@ -2,34 +2,33 @@ package com.medvedkov.paypal.controller;
 
 import com.medvedkov.paypal.security.SignInAdapterImpl;
 import com.paypal.api.payments.*;
-import com.paypal.base.exception.PayPalException;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/payment")
 @PreAuthorize("hasAuthority('STANDARD_USER')")
+@ConfigurationProperties(prefix = "security.paypal")
 public class PayPalController {
 
-    @Value("${client_id}")
     private String CLIENT_ID;
-    @Value("${client_secret}")
     private String CLIENT_SECRET;
-    @Value("${mode}")
     private String MODE;
+
     private static String paypalRedirectLink;
     private static final Logger logger = LoggerFactory.getLogger(SignInAdapterImpl.class);
 
@@ -105,6 +104,17 @@ public class PayPalController {
         return "sucess";
     }
 
+    public void setCLIENT_ID(String CLIENT_ID) {
+        this.CLIENT_ID = CLIENT_ID;
+    }
+
+    public void setCLIENT_SECRET(String CLIENT_SECRET) {
+        this.CLIENT_SECRET = CLIENT_SECRET;
+    }
+
+    public void setMODE(String MODE) {
+        this.MODE = MODE;
+    }
 }
 
 
