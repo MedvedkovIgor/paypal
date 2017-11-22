@@ -3,6 +3,7 @@ package com.medvedkov.paypal.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -15,7 +16,9 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 
 @Configuration
 @EnableAuthorizationServer
+@ConfigurationProperties(prefix = "security")
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+    private static final String REALM = "FPC";
 
     private TokenStore tokenStore;
     private UserDetailsServiceImpl userDetailsService;
@@ -23,23 +26,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
-    private static final String REALM = "FPC";
-
-    @Value("${security.client-id}")
     private String clientId;
-    @Value("${security.client-secret}")
     private String clientSecret;
-    @Value("${security.password-grant-type}")
-    private String passGrant;
-    @Value("${security.scope-read}")
+    private String passwordGrantType;
     private String scopeRead;
-    @Value("${security.scope-write}")
     private String scopeWrite;
-    @Value("${security.scope-trust}")
     private String scopeTrust;
-    @Value("${security.access-token-validity-seconds}")
     private int accessTokenValidityTime;
-    @Value("${security.refresh-token-validity-seconds}")
     private int refreshTokenValidityTime;
 
     @Autowired
@@ -57,7 +50,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         clients.inMemory()
                 .withClient(clientId)
                 .secret(clientSecret)
-                .authorizedGrantTypes(passGrant, "refresh_token")
+                .authorizedGrantTypes(passwordGrantType, "refresh_token")
                 .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes(scopeRead, scopeWrite, scopeTrust)
                 .accessTokenValiditySeconds(accessTokenValidityTime)
@@ -74,5 +67,37 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer.realm(REALM);
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public void setPasswordGrantType(String passwordGrantType) {
+        this.passwordGrantType = passwordGrantType;
+    }
+
+    public void setScopeRead(String scopeRead) {
+        this.scopeRead = scopeRead;
+    }
+
+    public void setScopeWrite(String scopeWrite) {
+        this.scopeWrite = scopeWrite;
+    }
+
+    public void setScopeTrust(String scopeTrust) {
+        this.scopeTrust = scopeTrust;
+    }
+
+    public void setAccessTokenValidityTime(int accessTokenValidityTime) {
+        this.accessTokenValidityTime = accessTokenValidityTime;
+    }
+
+    public void setRefreshTokenValidityTime(int refreshTokenValidityTime) {
+        this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
 }

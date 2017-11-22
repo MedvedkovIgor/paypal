@@ -22,7 +22,7 @@ public class User {
 
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<UserRole> roles;
 
     public User() {
