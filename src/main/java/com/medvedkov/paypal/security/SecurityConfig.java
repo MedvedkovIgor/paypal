@@ -5,9 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -72,21 +73,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/payment/**").permitAll()
-//                .antMatchers("/login*", "/signup/**", "/signin/**").permitAll()
+//                .antMatchers("/**").permitAll()
+                .antMatchers("/login*", "/signin/**", "/signup/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/signin")
+                .loginPage("/signin").permitAll()
                 .loginProcessingUrl("/signin/authenticate")
                 .failureUrl("/signin?param.error=bad_credentials")
                 .and()
                 .logout()
                 .logoutUrl("/signout")
                 .deleteCookies("JSESSIONID")
-                .and().rememberMe()
+//                .and().rememberMe()
                 .and()
                 .httpBasic()
                 .realmName("FPC");
@@ -130,6 +130,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.INTERFACES)
+    //FIXME У тебя вот этот бин автоваридся UsersConnectionRepository значит он есть в контейнере и его можно просто дополнить как-то
+    //работать с дефолтным бином - устанавливать connectionSignupService в конструкторе
     public UsersConnectionRepository usersConnectionRepository() {
         ((InMemoryUsersConnectionRepository) usersConnectionRepository).setConnectionSignUp(connectionSignupService);
         return usersConnectionRepository;
