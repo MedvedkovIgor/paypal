@@ -9,7 +9,7 @@
 <div class="container">
 
     <h1 class="col-sm-12">Login</h1>
-    <form th:action="@{/login/local}" method="POST" >
+    <form th:action="@{/local}" method="POST" >
         <div class="row col-sm-6">
             <div class="form-group">
                 <label class="col-sm-3">Username</label>
@@ -38,7 +38,6 @@
     <div class="col-sm-12">
         <form action="/signin/google" method="POST">
             <input type="hidden" name="scope" value="profile" />
-            <!--<input type="hidden" name="scope" value="https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo#email https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/tasks https://www-opensocial.googleusercontent.com/api/people" />-->
             <input type="submit" value="Login using Google" class="btn btn-primary" />
         </form>
     </div>
