@@ -92,12 +92,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .realmName("FPC");
     }
 
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
     @Bean
     public TokenStore tokenStore() {
         return new InMemoryTokenStore();
