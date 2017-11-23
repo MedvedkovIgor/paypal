@@ -17,8 +17,8 @@ import java.util.Arrays;
 @RestController
 public class SignupController {
 
-    private SignupServiceImpl signupService;
     private static final Logger logger = LoggerFactory.getLogger(SignupServiceImpl.class);
+    private SignupServiceImpl signupService;
 
     public SignupController(SignupServiceImpl signupService) {
         this.signupService = signupService;
