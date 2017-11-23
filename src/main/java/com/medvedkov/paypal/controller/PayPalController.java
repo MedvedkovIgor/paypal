@@ -24,16 +24,16 @@ import java.util.List;
 @ConfigurationProperties(prefix = "security.paypal")
 public class PayPalController {
 
-    private String CLIENT_ID;
-    private String CLIENT_SECRET;
-    private String MODE;
+    private String clientId;
+    private String clientSecret;
+    private String mode;
 
     private static String paypalRedirectLink;
     private static final Logger logger = LoggerFactory.getLogger(SignInAdapterImpl.class);
 
     @RequestMapping("/create")
     public ResponseEntity<Object> create(@RequestParam String total) {
-        APIContext apiContext = new APIContext(CLIENT_ID, CLIENT_SECRET, MODE);
+        APIContext apiContext = new APIContext(clientId, clientSecret, mode);
 
         Amount amount = new Amount();
         amount.setCurrency("USD");
@@ -85,7 +85,7 @@ public class PayPalController {
 
     @RequestMapping("/execute")
     public String execute(@RequestParam(value = "paymentId") String paymentId, @RequestParam(value = "token") String token, @RequestParam(value = "PayerID") String payerID) {
-        APIContext apiContext = new APIContext(CLIENT_ID, CLIENT_SECRET, MODE);
+        APIContext apiContext = new APIContext(clientId, clientSecret, mode);
 
         Payment payment = new Payment();
         payment.setId(paymentId);
@@ -102,16 +102,16 @@ public class PayPalController {
         return "sucess";
     }
 
-    public void setCLIENT_ID(String CLIENT_ID) {
-        this.CLIENT_ID = CLIENT_ID;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
-    public void setCLIENT_SECRET(String CLIENT_SECRET) {
-        this.CLIENT_SECRET = CLIENT_SECRET;
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
-    public void setMODE(String MODE) {
-        this.MODE = MODE;
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 }
 
