@@ -3,9 +3,11 @@ package com.medvedkov.paypal.security;
 import com.medvedkov.paypal.service.ConnectionSignupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,8 +39,6 @@ import javax.sql.DataSource;
 @ConfigurationProperties(prefix = "spring.social")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    @Qualifier("devDataSource")
     private DataSource dataSource;
 
     private ClientDetailsService clientDetailsService;
@@ -56,12 +56,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public SecurityConfig(ClientDetailsService clientDetailsService, UserDetailsServiceImpl userDetailsService,
                           UsersConnectionRepository usersConnectionRepository,
                           ConnectionSignupService connectionSignupService,
-                          SignInAdapterImpl signInAdapterImpl) {
+                          SignInAdapterImpl signInAdapterImpl,
+                          @Qualifier("dataSource") DataSource dataSource) {
         this.clientDetailsService = clientDetailsService;
         this.userDetailsService = userDetailsService;
         this.usersConnectionRepository = usersConnectionRepository;
         this.connectionSignupService = connectionSignupService;
         this.signInAdapterImpl = signInAdapterImpl;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -104,21 +106,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    //    @Bean
-//    public TokenStore tokenStore() {
-//        return new InMemoryTokenStore();
-//    }
     @Bean
-    @Qualifier("devDataSource")
     public JdbcTokenStore tokenStore() {
         return new JdbcTokenStore(dataSource);
-    }
-
-    @Primary
-    @Bean(name = "devDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
     }
 
     @Bean
