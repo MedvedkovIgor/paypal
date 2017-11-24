@@ -19,21 +19,17 @@ public class ConnectionSignupService implements ConnectionSignUp {
 
     private UserRepository userRepository;
     //FIXME сделать autowired
-    private PasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(SignInAdapterImpl.class);
 
-    public ConnectionSignupService(UserRepository userRepository){
-        this.userRepository=userRepository;
+    public ConnectionSignupService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public String execute(Connection<?> connection) {
         logger.info("Sign up new user");
-        final User user = new User();
-        user.setUsername(connection.getDisplayName());
-
-        user.setPassword(passwordEncoder.encode("pass"));
-        user.setRoles(Arrays.asList(new UserRole("USER")));
+        final User user = new User(connection.getDisplayName(), passwordEncoder.encode("pass"), Arrays.asList(new UserRole("USER")));
         userRepository.save(user);
         return user.getUsername();
     }
