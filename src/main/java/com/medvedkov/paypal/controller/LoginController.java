@@ -1,6 +1,7 @@
 package com.medvedkov.paypal.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 //@RestController
@@ -11,6 +12,11 @@ public class LoginController {
     public String signin() {
         return "login.html";
     }
+
+//    @GetMapping("/")
+//    public String root() {
+//        return "index.html";
+//    }
 
 //    @PostMapping(value = "/local")
 //    public void loginViaResourceAccount(@RequestBody String userName, @RequestBody String password){
