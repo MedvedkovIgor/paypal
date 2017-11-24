@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableAuthorizationServer
 @ConfigurationProperties(prefix = "security")
@@ -23,6 +25,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private UserDetailsServiceImpl userDetailsService;
     private UserApprovalHandler userApprovalHandler;
     private AuthenticationManager authenticationManager;
+    @Autowired
+    @Qualifier("devDataSource")
+    private DataSource dataSource;
 
     private String clientId;
     private String clientSecret;
@@ -45,14 +50,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient(clientId)
-                .secret(clientSecret)
-                .authorizedGrantTypes(passwordGrantType, "refresh_token")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .scopes(scopeRead, scopeWrite, scopeTrust)
-                .accessTokenValiditySeconds(accessTokenValidityTime)
-                .refreshTokenValiditySeconds(refreshTokenValidityTime);
+//        clients.inMemory()
+//                .withClient(clientId)
+//                .secret(clientSecret)
+//                .authorizedGrantTypes(passwordGrantType, "refresh_token")
+//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
+//                .scopes(scopeRead, scopeWrite, scopeTrust)
+//                .accessTokenValiditySeconds(accessTokenValidityTime)
+//                .refreshTokenValiditySeconds(refreshTokenValidityTime);
+        clients.jdbc(dataSource);
     }
 
     @Override
