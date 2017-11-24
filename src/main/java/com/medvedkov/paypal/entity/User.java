@@ -8,15 +8,17 @@ import java.util.List;
 
 @Entity
 @Table(name = "USERS")
-@Data
 @NoArgsConstructor
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String username;
+
     private String password;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<UserRole> roles;
 
@@ -25,5 +27,4 @@ public class User {
         this.password = password;
         this.roles = roles;
     }
-
 }
