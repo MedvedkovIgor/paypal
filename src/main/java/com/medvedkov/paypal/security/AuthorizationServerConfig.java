@@ -17,7 +17,6 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableAuthorizationServer
-@ConfigurationProperties(prefix = "security")
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     private static final String REALM = "FPC";
 
@@ -25,39 +24,22 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private UserDetailsServiceImpl userDetailsService;
     private UserApprovalHandler userApprovalHandler;
     private AuthenticationManager authenticationManager;
-    @Autowired
-    @Qualifier("devDataSource")
     private DataSource dataSource;
-
-    private String clientId;
-    private String clientSecret;
-    private String passwordGrantType;
-    private String scopeRead;
-    private String scopeWrite;
-    private String scopeTrust;
-    private int accessTokenValidityTime;
-    private int refreshTokenValidityTime;
 
     @Autowired
     public AuthorizationServerConfig(TokenStore tokenStore, UserDetailsServiceImpl userDetailsService,
                                      UserApprovalHandler userApprovalHandler,
-                                     @Qualifier("authenticationManagerBean") AuthenticationManager authenticationManager) {
+                                     @Qualifier("authenticationManagerBean") AuthenticationManager authenticationManager,
+                                     @Qualifier("dataSource") DataSource dataSource) {
         this.tokenStore = tokenStore;
         this.userDetailsService = userDetailsService;
         this.userApprovalHandler = userApprovalHandler;
         this.authenticationManager = authenticationManager;
+        this.dataSource=dataSource;
     }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-//        clients.inMemory()
-//                .withClient(clientId)
-//                .secret(clientSecret)
-//                .authorizedGrantTypes(passwordGrantType, "refresh_token")
-//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-//                .scopes(scopeRead, scopeWrite, scopeTrust)
-//                .accessTokenValiditySeconds(accessTokenValidityTime)
-//                .refreshTokenValiditySeconds(refreshTokenValidityTime);
         clients.jdbc(dataSource);
     }
 
@@ -73,35 +55,4 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         oauthServer.realm(REALM);
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
-
-    public void setPasswordGrantType(String passwordGrantType) {
-        this.passwordGrantType = passwordGrantType;
-    }
-
-    public void setScopeRead(String scopeRead) {
-        this.scopeRead = scopeRead;
-    }
-
-    public void setScopeWrite(String scopeWrite) {
-        this.scopeWrite = scopeWrite;
-    }
-
-    public void setScopeTrust(String scopeTrust) {
-        this.scopeTrust = scopeTrust;
-    }
-
-    public void setAccessTokenValidityTime(int accessTokenValidityTime) {
-        this.accessTokenValidityTime = accessTokenValidityTime;
-    }
-
-    public void setRefreshTokenValidityTime(int refreshTokenValidityTime) {
-        this.refreshTokenValidityTime = refreshTokenValidityTime;
-    }
 }
