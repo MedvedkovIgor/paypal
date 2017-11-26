@@ -10,11 +10,7 @@ import java.util.List;
 @Table(name = "USERS")
 @NoArgsConstructor
 @Data
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+public class User extends DefaultEntity {
     private String username;
 
     private String password;
